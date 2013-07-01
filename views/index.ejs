@@ -1,0 +1,45 @@
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="http://localhost:3000/javascripts/faye-browser-min.js"></script>
+<script>
+var client = new Faye.Client('http://localhost:3000/faye');
+
+client.subscribe('/messages', function(message) {
+	$('#messages').prepend('<li>'+message.text+'</li>');
+});
+
+$(document).ready(function(){
+	$('#publish').click(function(){
+		if($('#text').val()){
+			client.publish('/messages', {
+			  text: $('#text').val()
+			});
+			$('#text').val('')
+		}
+	});
+});
+</script>
+</head>
+<body>
+	<h2>Chat</h2>
+	<% if(!users){ %>
+	<div id="login">
+		<h3>Inicia sesion con...</h3>
+		<a href="/auth/twitter">Twitter</a>
+		<a href="/auth/facebook">Facebook</a>
+	</div>	
+	<% } else{ %>
+	<div id="chat">
+		<h3>Bienvenido <%=users.username %></h3>
+		<img src="<%=users.avatar %>" alt="<%=users.username %>">
+		<div>
+			<input id="text" type="text"/>
+			<button id="publish">Publish</button>
+		</div>
+		<ul id="messages">
+		</ul>
+	</div>
+	<% } %>
+</body>
+</html>
